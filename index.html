@@ -81,11 +81,37 @@
     }
 
     #calculation-output {
-      margin-top: 20px;
-      padding: 15px;
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      min-width: 300px;
+      max-width: 90vw;
       background: #e9ecef;
       border-radius: 5px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 20px rgba(0, 0, 0, 0.2);
+      padding: 24px 32px 24px 24px;
+      z-index: 1000;
+    }
+
+    #calculation-output.active {
+      display: block;
+    }
+
+    #close-output {
+      position: absolute;
+      top: 8px;
+      right: 12px;
+      background: transparent;
+      border: none;
+      font-size: 20px;
+      cursor: pointer;
+      color: #888;
+    }
+
+    #close-output:hover {
+      color: #333;
     }
   </style>
 </head>
@@ -116,12 +142,17 @@
     <button type="submit">Calculate</button>
   </form>
 
-  <div id="calculation-output"></div>
+  <div id="calculation-output">
+    <button id="close-output" title="Close">&times;</button>
+    <div id="calculation-content"></div>
+  </div>
 
   <script>
     document.addEventListener('DOMContentLoaded', function () {
       const form = document.getElementById('cable-estimation-form');
       const output = document.getElementById('calculation-output');
+      const outputContent = document.getElementById('calculation-content');
+      const closeBtn = document.getElementById('close-output');
 
       form.addEventListener('submit', function (event) {
         event.preventDefault();
@@ -135,11 +166,16 @@
         const numberOfMaintenanceLoops = conduitDistance < 500 ? 0 : Math.ceil(conduitDistance / 500);
         const estimatedCableLength = (conduitDistance + (numberOfRingBarks * 40) + aEndDistance + zEndDistance) * (1 + (allowancePercentage / 100));
 
-        output.innerHTML = `
-                    <h3>Calculation Results:</h3>
-                    <p>Number of Maintenance Loops: ${numberOfMaintenanceLoops}</p>
-                    <p>Estimated Cable Length: ${estimatedCableLength.toFixed(2)} m</p>
-                `;
+        outputContent.innerHTML = `
+          <h3>Calculation Results:</h3>
+          <p>Number of Maintenance Loops: ${numberOfMaintenanceLoops}</p>
+          <p>Estimated Cable Length: ${estimatedCableLength.toFixed(2)} m</p>
+        `;
+        output.classList.add('active');
+      });
+
+      closeBtn.addEventListener('click', function () {
+        output.classList.remove('active');
       });
     });
   </script>
